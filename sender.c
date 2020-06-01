@@ -23,12 +23,12 @@ if (i>5) // change to "Reno"
  int len = strlen(buff);
  if (setsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, buff, len) != 0) {
 	perror("setsockopt"); 
-	return -1;
+	return ;
  }
 }
  // create file 
  FILE *fp;
- fp=fopen("create_large_file.py","r");  // open file uses both stdio and stdin header files
+ fp=fopen("1gb.txt","r");  // open file uses both stdio and stdin header files
            // file should be present at the program directory
 if( fp == NULL ){
   printf("Error IN Opening File .. \n");

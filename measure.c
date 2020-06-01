@@ -19,28 +19,22 @@ void func(int sockfd, int i)
  	int len = strlen(buff);
  	if (setsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, buff, len) != 0) {
 		perror("setsockopt"); 
-		return -1;
+		return ;
 	}
 
 }
 int len = sizeof(buff); 
 if (getsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, buff, &len) != 0) { 
 	perror("getsockopt");
-	return -1;
+	return ;
 } 
 printf("Current: %s\n", buff);
- FILE *fp;
- fp=fopen("received.txt","w"); // stores the file content in recieved.txt in the program directory
- 
- if( fp == NULL ){
-  printf("Error IN Opening File ");
-  return ;
- }
- 
+
+ int counter = 0;
  while( read(sockfd,buff,MAX) > 0 )
-  fprintf(fp,"%s",buff);
+  counter++;
  
- printf("File %d received successfully !! \n",i);
+ printf("File %d received successfully !! counter is:%d \n",i,counter);
 } 
 
 int main() 
@@ -93,7 +87,7 @@ int main()
      	clock_t start, end;
      	double cpu_time_used;
 	double sum = 0;
-	// Function for chatting between client and server
+	// Function for send-recv file between client and server
 	for (int i = 1; i <= 10; ++i) 
 	{
 		start = clock();
@@ -101,16 +95,17 @@ int main()
  		end = clock();
      		cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 		sum += cpu_time_used;
-		printf("transfer file took %f seconds to execute \n", cpu_time_used); 
+		printf("transfer file %d took %f seconds to execute \n",i, cpu_time_used); 
 		if (i == 5)
 		{
 			sum /= 5;
 			printf("the 1st cubic avg is: %f \n",sum);
 			sum = 0;
 		}
-	} 
+	}
+	sum /= 5; // reno avg 
 	printf("the 2st reno avg is: %f \n",sum);
-	// After chatting close the socket 
+	// After send-recv close the socket 
 	close(sockfd); 
 } 
 
