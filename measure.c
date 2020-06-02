@@ -6,35 +6,33 @@
 #include <sys/types.h> 
 #include <netinet/tcp.h> 
 #include <unistd.h> 
+#include <arpa/inet.h>
 #include <time.h>
+#include <sys/time.h>
 #define MAX 256 
 #define PORT 8080 
 #define SA struct sockaddr 
 void recvFile(int sockfd, int i) 
 { 
- char buff[MAX];  // to store message from client
- if (i>5) // change to "Reno"
-{ 
- 	strcpy(buff, "reno"); 
- 	int len = strlen(buff);
- 	if (setsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, buff, len) != 0) {
-		perror("setsockopt"); 
-		return ;
+	char buff[MAX];  // to store message from client
+ 	if (i>5) // change to "Reno"
+	{ 
+		strcpy(buff, "reno"); 
+		int len = strlen(buff);
+		if (setsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, buff, len) != 0) {
+			perror("setsockopt"); 
+			return ;
+		}
 	}
-
-}
-int len = sizeof(buff); 
-if (getsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, buff, &len) != 0) { 
-	perror("getsockopt");
-	return ;
-} 
-printf("Current: %s\n", buff);
-
- int counter = 0;
- while( read(sockfd,buff,MAX) > 0 )
-  counter++;
- 
- printf("File %d received successfully !! counter is:%d \n",i,counter);
+ 	int counter = 0;
+ 	while( read(sockfd,buff,MAX) > 0 )
+  		counter++;
+ 	int len = sizeof(buff); 
+	if (getsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, buff, &len) != 0) { 
+		perror("getsockopt");
+		return ;
+	} 
+ printf("File %d received, chunks: %d using: %s\n",i,counter, buff);
 } 
 
 int main() 
@@ -74,15 +72,6 @@ int main()
 		printf("Server listening..\n"); 
 	len = sizeof(cli); 
 
-	// Accept the data packet from client and verification 
-	connfd = accept(sockfd, (SA*)&cli, &len); 
-	if (connfd < 0) { 
-		printf("server acccept failed...\n"); 
-		exit(0); 
-	} 
-	else
-		printf("server acccept the client...\n"); 
-
 	// Measure Time
      	clock_t start, end;
      	double cpu_time_used;
@@ -90,22 +79,39 @@ int main()
 	// Function for send-recv file between client and server
 	for (int i = 1; i <= 10; ++i) 
 	{
-		start = clock();
+		// Accept the data packet from client and verification 
+		connfd = accept(sockfd, (SA*)&cli, &len); 
+		if (connfd < 0) { 
+			printf("server acccept failed...\n"); 
+			exit(0); 
+		} 
+		else
+			printf("server acccept the client...\n"); 
+		
 		recvFile(connfd, i); // recv func
- 		end = clock();
-     		cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-		sum += cpu_time_used;
-		printf("transfer file %d took %f seconds to execute \n",i, cpu_time_used); 
-		if (i == 5)
-		{
-			sum /= 5;
-			printf("the 1st cubic avg is: %f \n",sum);
-			sum = 0;
-		}
+ 		
+		time_t timeAfter;
+    		time(&timeAfter);
+		long times[10];
+    		printf("time for this file is %ld \n",timeAfter-timeBefore);
+    		times[i] = timeAfter-timeBefore;
+		close(connfd); 
 	}
-	sum /= 5; // reno avg 
-	printf("the 2st reno avg is: %f \n",sum);
-	// After send-recv close the socket 
-	close(sockfd); 
+	long count=0;
+    	for(int i =0;i<5;i++)
+    	{
+        	count = count+times[i];
+    	}
+   	printf("average time for Cubic is : %ld",count/5);
+    	count=0;
+    	for(int i =5;i<10;i++)
+    	{
+        	count = count+times[i];
+    	}
+    	printf("average time for reno is : %ld",count/5);
+    	int OKAY =1;
+    	setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&OKAY,sizeof(int));
+	close(sockfd);
+	return 0;
 } 
 
