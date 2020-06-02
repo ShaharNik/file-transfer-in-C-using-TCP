@@ -35,21 +35,39 @@ if( fp == NULL ){
   printf("Error IN Opening File .. \n");
   return ;
  }
+ int counter =0;
+ while ( fgets(buff,MAX,fp) != NULL ) // fgets reads upto MAX character or EOF
+ {
+  	write(sockfd,buff,sizeof(buff));  // sent the file data to stream
+	counter++;
+ }
  
- while ( fgets(buff,MAX,fp) != NULL ) // fgets reads upto MAX character or EOF 
-  write(sockfd,buff,sizeof(buff));  // sent the file data to stream
- 
+printf("Sent %d chunks using ",counter);
+if (i <= 5)
+	printf("cubic\n");
+else
+        printf("reno \n");
  fclose (fp);       // close the file 
- 
- printf("File %d Sent successfully !!! \n",i);
 } 
+
 
 
 int main() 
 { 
 	int sockfd, connfd; 
 	struct sockaddr_in servaddr, cli; 
-
+	// assign IP, PORT 
+	servaddr.sin_family = AF_INET; 
+	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
+	servaddr.sin_port = htons(PORT); 
+	// connect the client socket to server socket 
+	if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) { 
+		printf("connection with the server failed...\n"); 
+		exit(0); 
+	} 
+	else
+		printf("connected to the server..\n"); 
+	
 	// socket create and varification 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0); 
 	if (sockfd == -1) { 
@@ -60,25 +78,26 @@ int main()
 		printf("Socket successfully created..\n"); 
 	bzero(&servaddr, sizeof(servaddr)); 
 
-	// assign IP, PORT 
-	servaddr.sin_family = AF_INET; 
-	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
-	servaddr.sin_port = htons(PORT); 
 
-	// connect the client socket to server socket 
-	if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) { 
-		printf("connection with the server failed...\n"); 
-		exit(0); 
-	} 
-	else
-		printf("connected to the server..\n"); 
-
-	// function for chat 
 	for (int i=1; i<=10; ++i)
-		sendFile(sockfd, i);
-
-
+	{
+		// socket create and varification 
+		sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+		if (sockfd == -1) { 
+			printf("socket creation failed...\n"); 
+			exit(0); 
+		} 
+	else
+		printf("Socket successfully created..\n"); 
+	bzero(&servaddr, sizeof(servaddr)); // ??
+		
+	sendFile(sockfd, i); // Function for sending file
+	int OKAY = 1;
+        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &OKAY, sizeof(int));
+		
 	// close the socket 
 	close(sockfd); 
+	}
+return 0;
 } 
 
