@@ -76,6 +76,7 @@ int main()
      	clock_t start, end;
      	double cpu_time_used;
 	double sum = 0;
+	long times[10];
 	// Function for send-recv file between client and server
 	for (int i = 1; i <= 10; ++i) 
 	{
@@ -90,9 +91,10 @@ int main()
 		
 		recvFile(connfd, i); // recv func
  		
+    		time_t timeBefore;
+    		time(&timeBefore);
 		time_t timeAfter;
     		time(&timeAfter);
-		long times[10];
     		printf("time for this file is %ld \n",timeAfter-timeBefore);
     		times[i] = timeAfter-timeBefore;
 		close(connfd); 
@@ -110,7 +112,7 @@ int main()
     	}
     	printf("average time for reno is : %ld",count/5);
     	int OKAY =1;
-    	setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&OKAY,sizeof(int));
+    	setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&OKAY,sizeof(int));
 	close(sockfd);
 	return 0;
 } 

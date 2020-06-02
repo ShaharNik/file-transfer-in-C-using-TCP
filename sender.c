@@ -15,39 +15,36 @@
 // send file from client to server 
 void sendFile(int sockfd, int i) 
 { 
- char buff[MAX];       // for read operation from file and used to sent operation
-	// printf("%d",sizeof(buff)); 
-if (i>5) // change to "Reno"
-{ 
- strcpy(buff, "reno"); 
-// printf("%d",sizeof(buff)); 
- int len = strlen(buff);
- if (setsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, buff, len) != 0) {
-	perror("setsockopt"); 
-	return ;
- }
-}
- // create file 
- FILE *fp;
- fp=fopen("1gb.txt","r");  // open file uses both stdio and stdin header files
+	char buff[MAX];       // for read operation from file and used to sent operation 
+	if (i>5) // change to "Reno"
+	{ 
+ 		strcpy(buff, "reno");  
+ 		int len = strlen(buff);
+ 		if (setsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, buff, len) != 0) {
+			perror("setsockopt"); 
+			return ;
+ 		}
+	}
+ 	// create file 
+ 	FILE *fp;
+ 	fp=fopen("1gb.txt","r");  // open file uses both stdio and stdin header files
            // file should be present at the program directory
-if( fp == NULL ){
-  printf("Error IN Opening File .. \n");
-  return ;
- }
- int counter =0;
- while ( fgets(buff,MAX,fp) != NULL ) // fgets reads upto MAX character or EOF
- {
-  	write(sockfd,buff,sizeof(buff));  // sent the file data to stream
-	counter++;
- }
- 
-printf("Sent %d chunks using ",counter);
-if (i <= 5)
-	printf("cubic\n");
-else
-        printf("reno \n");
- fclose (fp);       // close the file 
+	if( fp == NULL ){
+  		printf("Error IN Opening File .. \n");
+  		return ;
+ 	}
+ 	int counter =0;
+ 	while ( fgets(buff,MAX,fp) != NULL ) // fgets reads upto MAX character or EOF
+ 	{
+  		write(sockfd,buff,sizeof(buff));  // sent the file data to stream
+		counter++;
+ 	}
+	printf("Sent %d chunks using ",counter);
+	if (i <= 5)
+		printf("cubic\n");
+	else
+        	printf("reno \n");
+ 	fclose (fp);       // close the file 
 } 
 
 
@@ -87,17 +84,17 @@ int main()
 			printf("socket creation failed...\n"); 
 			exit(0); 
 		} 
-	else
-		printf("Socket successfully created..\n"); 
-	bzero(&servaddr, sizeof(servaddr)); // ??
+		else
+			printf("Socket successfully created..\n"); 
+		bzero(&servaddr, sizeof(servaddr)); 
 		
-	sendFile(sockfd, i); // Function for sending file
-	int OKAY = 1;
-        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &OKAY, sizeof(int));
+		sendFile(sockfd, i); // Function for sending file
+		int OKAY = 1;
+        	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &OKAY, sizeof(int));
 		
-	// close the socket 
-	close(sockfd); 
+		// close the socket 
+		close(sockfd); 
 	}
-return 0;
+	return 0;
 } 
 
