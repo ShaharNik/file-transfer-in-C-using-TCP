@@ -7,12 +7,13 @@
 #include <sys/types.h> 
 #include <netinet/tcp.h> 
 #include <unistd.h> 
-#define MAX 80 
+#include <arpa/inet.h>
+#define MAX 256 
 #define PORT 8080 
 #define SA struct sockaddr 
 
-// Function designed for chat between client and server. 
-void func(int sockfd, int i) 
+// send file from client to server 
+void sendFile(int sockfd, int i) 
 { 
  char buff[MAX];       // for read operation from file and used to sent operation
 	// printf("%d",sizeof(buff)); 
@@ -43,7 +44,7 @@ if( fp == NULL ){
  printf("File %d Sent successfully !!! \n",i);
 } 
 
-// Driver function 
+
 int main() 
 { 
 	int sockfd, connfd; 
@@ -74,7 +75,7 @@ int main()
 
 	// function for chat 
 	for (int i=1; i<=10; ++i)
-		func(sockfd, i);
+		sendFile(sockfd, i);
 
 
 	// close the socket 

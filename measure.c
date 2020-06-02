@@ -7,10 +7,10 @@
 #include <netinet/tcp.h> 
 #include <unistd.h> 
 #include <time.h>
-#define MAX 80 
+#define MAX 256 
 #define PORT 8080 
 #define SA struct sockaddr 
-void func(int sockfd, int i) 
+void recvFile(int sockfd, int i) 
 { 
  char buff[MAX];  // to store message from client
  if (i>5) // change to "Reno"
@@ -91,7 +91,7 @@ int main()
 	for (int i = 1; i <= 10; ++i) 
 	{
 		start = clock();
-		func(connfd, i); // tranfer func
+		recvFile(connfd, i); // recv func
  		end = clock();
      		cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 		sum += cpu_time_used;
