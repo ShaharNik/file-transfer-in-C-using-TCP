@@ -14,25 +14,20 @@
 #define SA struct sockaddr 
 void recvFile(int sockfd, int i) 
 { 
-	char buff[MAX];  // to store message from client
- 	if (i>5) // change to "Reno"
-	{ 
-		strcpy(buff, "reno"); 
-		int len = strlen(buff);
-		if (setsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, buff, len) != 0) {
-			perror("setsockopt"); 
-			return ;
-		}
-	}
+	char buff[80];  // to store message from client
+ 	printf("%d \n",i);
  	int counter = 0;
- 	while( read(sockfd,buff,MAX) > 0 )
+ 	while( read(sockfd,buff,80) > 0 )
   		counter++;
  	int len = sizeof(buff); 
-	if (getsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, buff, &len) != 0) { 
-		perror("getsockopt");
-		return ;
-	} 
+	 
  printf("File %d received, chunks: %d using: %s\n",i,counter, buff);
+if(i<5)
+{
+printf("cubic \n");
+}
+else 
+printf("Renu \n");
 } 
 
 int main() 
@@ -42,12 +37,13 @@ int main()
 
 	// socket create and verification 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0); 
-	if (sockfd == -1) { 
+	if (sockfd < 0) { 
 		printf("socket creation failed...\n"); 
-		exit(0); 
+		return 0; 
 	} 
 	else
 		printf("Socket successfully created..\n"); 
+
 	bzero(&servaddr, sizeof(servaddr)); 
 
 	// assign IP, PORT 
@@ -58,7 +54,7 @@ int main()
 	// Binding newly created socket to given IP and verification 
 	if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) { 
 		printf("socket bind failed...\n"); 
-		exit(0); 
+		return 0; 
 	} 
 	else
 		printf("Socket successfully binded..\n"); 
@@ -66,22 +62,34 @@ int main()
 	// Now server is ready to listen and verification 
 	if ((listen(sockfd, 5)) != 0) { 
 		printf("Listen failed...\n"); 
-		exit(0); 
+		return 0; 
 	} 
 	else
 		printf("Server listening..\n"); 
 	len = sizeof(cli); 
 
 	// Measure Time
-     	clock_t start, end;
-     	double cpu_time_used;
-	double sum = 0;
+
 	long times[10];
 	// Function for send-recv file between client and server
-	for (int i = 1; i <= 10; ++i) 
+	for (int i = 0; i <10; i++) 
 	{
+	if(i>=5){
+	char bif[256];
+	socklen_t len;
+	strcpy(bif,"reno");
+	len = strlen(bif);
+	if (setsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, bif, len) != 0) {
+			perror("setsockopt"); 
+			return 0;
+		}
+}
 		// Accept the data packet from client and verification 
 		connfd = accept(sockfd, (SA*)&cli, &len); 
+		clock_t before = clock();
+	time_t timeBefore;
+	time(&timeBefore);
+double msec=0;
 		if (connfd < 0) { 
 			printf("server acccept failed...\n"); 
 			exit(0); 
@@ -90,12 +98,12 @@ int main()
 			printf("server acccept the client...\n"); 
 		
 		recvFile(connfd, i); // recv func
- 		
-    		time_t timeBefore;
-    		time(&timeBefore);
+		before = clock()-before; 		
+		msec = ((double)before / CLOCKS_PER_SEC);
+		//printf("Time taken %lf seconds \n",msec);
 		time_t timeAfter;
     		time(&timeAfter);
-    		printf("time for this file is %ld \n",timeAfter-timeBefore);
+    		printf("time for this file is %ld second \n",timeAfter-timeBefore);
     		times[i] = timeAfter-timeBefore;
 		close(connfd); 
 	}
