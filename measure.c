@@ -112,13 +112,13 @@ double msec=0;
     	{
         	count = count+times[i];
     	}
-   	printf("average time for Cubic is : %ld",count/5);
+   	printf("average time for Cubic is : %ld \n",count/5);
     	count=0;
     	for(int i =5;i<10;i++)
     	{
         	count = count+times[i];
     	}
-    	printf("average time for reno is : %ld",count/5);
+    	printf("average time for reno is : %ld ",count/5);
     	int OKAY =1;
     	setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&OKAY,sizeof(int));
 	close(sockfd);

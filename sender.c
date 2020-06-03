@@ -57,7 +57,7 @@ int main()
 	// socket create and varification 
 
 
-	for (int i=1; i<=10; ++i)
+	for (int i=0; i<10; i++)
 	{
 		sockfd = socket(AF_INET, SOCK_STREAM, 0); 
 	if(i>=5)
@@ -82,11 +82,11 @@ int main()
 		// socket create and varification 
 		if (sockfd == -1) { 
 			printf("socket creation failed...\n"); 
-			exit(0); 
+			return 0; 
 		} 
 		else
 			printf("Socket successfully created..\n"); 
-		bzero(&servaddr, sizeof(servaddr)); 
+		//bzero(&servaddr, sizeof(servaddr)); 
 		
 		sendFile(sockfd, i); // Function for sending file
 		int OKAY = 1;
